@@ -1,0 +1,63 @@
+import type { ComponentProps } from 'react';
+import { siteConfig } from '@/config/site';
+import { Icon } from '@/components/ui/Icon';
+import { buttonClasses, type ButtonSize, type ButtonVariant } from '@/components/ui/button';
+
+// The only place where the WhatsApp and phone URLs are built.
+const WHATSAPP_URL = `https://wa.me/${siteConfig.phone.whatsapp}`;
+const TEL_URL = `tel:${siteConfig.phone.tel}`;
+
+type AnchorProps = Omit<ComponentProps<'a'>, 'href' | 'target' | 'rel'>;
+
+/** Unstyled link to the salon's WhatsApp chat (opens in a new tab). */
+export function WhatsAppLink(props: AnchorProps) {
+  return <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" {...props} />;
+}
+
+/** Unstyled link that starts a phone call to the salon. */
+export function CallLink(props: AnchorProps) {
+  return <a href={TEL_URL} {...props} />;
+}
+
+/** The salon phone number, always laid out left-to-right. */
+export function PhoneNumber({ className }: { className?: string }) {
+  return (
+    <bdi dir="ltr" className={className}>
+      {siteConfig.phone.display}
+    </bdi>
+  );
+}
+
+type ButtonProps = {
+  label: string;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  full?: boolean;
+  className?: string;
+};
+
+export function WhatsAppButton({
+  label,
+  newTabHint,
+  variant = 'primary',
+  size = 'md',
+  full,
+  className,
+}: ButtonProps & { /** Screen-reader note that the link opens a new tab. */ newTabHint?: string }) {
+  return (
+    <WhatsAppLink className={buttonClasses({ variant, size, full, className })}>
+      <Icon name="whatsapp" className="size-5" />
+      {label}
+      {newTabHint ? <span className="sr-only"> {newTabHint}</span> : null}
+    </WhatsAppLink>
+  );
+}
+
+export function CallButton({ label, variant = 'outline', size = 'md', full, className }: ButtonProps) {
+  return (
+    <CallLink className={buttonClasses({ variant, size, full, className })}>
+      <Icon name="phone" className="size-[1.125rem]" />
+      {label}
+    </CallLink>
+  );
+}
