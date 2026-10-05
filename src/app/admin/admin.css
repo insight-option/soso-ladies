@@ -1,0 +1,69 @@
+/* Amplify UI themed with the SOSO tokens (cream, white cards, muted magenta, plum). */
+:root,
+[data-amplify-theme] {
+  --amplify-colors-brand-primary-10: #f8ecea;
+  --amplify-colors-brand-primary-20: #f0dcdb;
+  --amplify-colors-brand-primary-40: #d9a3bb;
+  --amplify-colors-brand-primary-60: #b9487b;
+  --amplify-colors-brand-primary-80: #a31d5a;
+  --amplify-colors-brand-primary-90: #8a174a;
+  --amplify-colors-brand-primary-100: #5b0f3a;
+  --amplify-colors-font-primary: #2b2326;
+  --amplify-colors-font-secondary: #6c6165;
+  --amplify-colors-font-interactive: #a31d5a;
+  --amplify-colors-border-primary: #e2d3cf;
+  --amplify-colors-border-focus: #a31d5a;
+  --amplify-fonts-default-variable: var(--font-sans);
+  --amplify-fonts-default-static: var(--font-sans);
+  --amplify-radii-small: 0.75rem;
+  --amplify-radii-medium: 0.75rem;
+  --amplify-radii-large: 1.25rem;
+  --amplify-components-button-primary-background-color: #a31d5a;
+  --amplify-components-button-primary-hover-background-color: #8a174a;
+  --amplify-components-button-primary-focus-background-color: #8a174a;
+  --amplify-components-button-primary-active-background-color: #8a174a;
+  --amplify-components-button-link-color: #a31d5a;
+  --amplify-components-button-link-hover-background-color: #f8ecea;
+  --amplify-components-button-link-hover-color: #8a174a;
+  --amplify-components-fieldcontrol-focus-box-shadow: 0 0 0 2px rgb(163 29 90 / 0.2);
+}
+
+[data-amplify-authenticator] {
+  --amplify-components-authenticator-router-background-color: #ffffff;
+  --amplify-components-authenticator-router-border-width: 0;
+  --amplify-components-authenticator-router-box-shadow: 0 2px 4px rgb(91 15 58 / 0.05),
+    0 18px 40px -16px rgb(91 15 58 / 0.24);
+  --amplify-components-authenticator-container-width-max: 27rem;
+  --amplify-components-authenticator-form-padding: 1.5rem 1.75rem 2rem;
+  min-height: 100dvh;
+  padding: 1.5rem 1rem;
+}
+
+[data-amplify-authenticator] [data-amplify-router] {
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+[data-amplify-authenticator] .amplify-heading {
+  font-family: var(--font-display);
+  color: #5b0f3a;
+}
+
+/* Email and password are typed left-to-right even on the Arabic page. */
+[data-amplify-authenticator] input[type='email'],
+[data-amplify-authenticator] input[type='password'],
+[data-amplify-authenticator] input[name='username'],
+[data-amplify-authenticator] input[name='email'] {
+  direction: ltr;
+  text-align: left;
+}
+
+[data-amplify-authenticator] .amplify-button--primary {
+  font-weight: 600;
+}
+
+/* The password input is forced LTR above, so its logical corners resolve the wrong
+   way inside the RTL admin: round its right side, next to the label, explicitly. */
+[dir='rtl'] [data-amplify-authenticator] .amplify-passwordfield .amplify-input {
+  border-radius: 0 var(--amplify-radii-small) var(--amplify-radii-small) 0;
+}
