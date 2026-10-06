@@ -1,6 +1,5 @@
 import 'server-only';
 
-import { unstable_cache } from 'next/cache';
 import { cache } from 'react';
 import type { Schema } from '@amplify/data/resource';
 import { isIconName } from '@/components/ui/Icon';
@@ -17,12 +16,14 @@ import { resolveMediaPath } from '@/lib/media';
  * back to the static files in src/config whenever the backend is missing,
  * empty or unreachable, so local development and builds never break.
  *
- * Every database read runs inside `unstable_cache` (60 s). Amplify fetches the
- * guest credentials with `cache: 'no-store'`; outside a cache scope that would
- * make every page dynamic (rendered on each request) instead of ISR.
+ * Caching: public pages render on every request (`dynamic = 'force-dynamic'`),
+ * and successful database responses are kept in memory for 60 s per server
+ * instance. Failures are never cached, so the next request retries, and a new
+ * instance always starts from the database (never from build-time data).
+ * Admin edits therefore appear on every page within about 60 seconds.
  */
 
-const REVALIDATE_SECONDS = 60;
+const CACHE_TTL_MS = 60_000;
 
 export type Service = ServiceDefinition;
 export type { ContactDetails };
@@ -48,6 +49,35 @@ type ServiceRow = Schema['Service']['type'];
 type OfferRow = Schema['Offer']['type'];
 type SettingsRow = Schema['SiteSettings']['type'];
 
+/** A successful database response (a failure is represented by `null` instead). */
+type DbResult<T> = { data: T };
+
+type CacheEntry = { value: DbResult<unknown>; expiresAt: number };
+const memoryCache = new Map<string, CacheEntry>();
+const inFlight = new Map<string, Promise<DbResult<unknown> | null>>();
+
+/**
+ * Returns a successful database response cached for 60 s in this server
+ * instance. `read` resolves to null on failure; null is never cached.
+ * Concurrent requests share one in-flight read.
+ */
+async function cachedRead<T>(key: string, read: () => Promise<DbResult<T> | null>): Promise<DbResult<T> | null> {
+  const hit = memoryCache.get(key);
+  if (hit && hit.expiresAt > Date.now()) return hit.value as DbResult<T>;
+
+  let request = inFlight.get(key) as Promise<DbResult<T> | null> | undefined;
+  if (!request) {
+    request = read()
+      .then((result) => {
+        if (result) memoryCache.set(key, { value: result, expiresAt: Date.now() + CACHE_TTL_MS });
+        return result;
+      })
+      .finally(() => inFlight.delete(key));
+    inFlight.set(key, request);
+  }
+  return request;
+}
+
 const PAGE_SIZE = 1000;
 
 function bySortOrder(a: { sortOrder?: number | null }, b: { sortOrder?: number | null }) {
@@ -67,52 +97,69 @@ function price(value: number | null | undefined): number | null {
   return typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : null;
 }
 
-async function listServiceRows(): Promise<ServiceRow[] | null> {
-  return runAsGuest(async ({ client }, context) => {
-    const rows: ServiceRow[] = [];
-    let nextToken: string | null | undefined;
-    do {
-      const page = await client.models.Service.list(context, {
-        authMode: 'identityPool',
-        limit: PAGE_SIZE,
-        nextToken,
-      });
-      if (page.errors?.length) throw new Error(page.errors.map((e) => e.message).join('; '));
-      rows.push(...page.data);
-      nextToken = page.nextToken;
-    } while (nextToken);
-    return rows;
+function warnIfEmpty(model: string, rows: unknown[]) {
+  if (rows.length === 0) console.warn(`[content] ${model}: database returned 0 rows; using static config`);
+}
+
+function readServiceRows(): Promise<DbResult<ServiceRow[]> | null> {
+  return cachedRead('services', async () => {
+    const rows = await runAsGuest(async ({ client }, context) => {
+      const all: ServiceRow[] = [];
+      let nextToken: string | null | undefined;
+      do {
+        const page = await client.models.Service.list(context, {
+          authMode: 'identityPool',
+          limit: PAGE_SIZE,
+          nextToken,
+        });
+        if (page.errors?.length) throw new Error(page.errors.map((e) => e.message).join('; '));
+        all.push(...page.data);
+        nextToken = page.nextToken;
+      } while (nextToken);
+      return all;
+    }, 'services read');
+    if (!rows) return null;
+    warnIfEmpty('services', rows);
+    return { data: rows };
   });
 }
 
-async function listOfferRows(): Promise<OfferRow[] | null> {
-  return runAsGuest(async ({ client }, context) => {
-    const rows: OfferRow[] = [];
-    let nextToken: string | null | undefined;
-    do {
-      const page = await client.models.Offer.list(context, {
-        authMode: 'identityPool',
-        limit: PAGE_SIZE,
-        nextToken,
-      });
-      if (page.errors?.length) throw new Error(page.errors.map((e) => e.message).join('; '));
-      rows.push(...page.data);
-      nextToken = page.nextToken;
-    } while (nextToken);
-    return rows;
+function readOfferRows(): Promise<DbResult<OfferRow[]> | null> {
+  return cachedRead('offers', async () => {
+    const rows = await runAsGuest(async ({ client }, context) => {
+      const all: OfferRow[] = [];
+      let nextToken: string | null | undefined;
+      do {
+        const page = await client.models.Offer.list(context, {
+          authMode: 'identityPool',
+          limit: PAGE_SIZE,
+          nextToken,
+        });
+        if (page.errors?.length) throw new Error(page.errors.map((e) => e.message).join('; '));
+        all.push(...page.data);
+        nextToken = page.nextToken;
+      } while (nextToken);
+      return all;
+    }, 'offers read');
+    if (!rows) return null;
+    warnIfEmpty('offers', rows);
+    return { data: rows };
   });
 }
 
-async function getSettingsRow(): Promise<SettingsRow | null> {
-  return runAsGuest(async ({ client }, context) => {
-    const { data, errors } = await client.models.SiteSettings.get(
-      context,
-      { id: 'main' },
-      { authMode: 'identityPool' },
-    );
-    if (errors?.length) throw new Error(errors.map((e) => e.message).join('; '));
-    return data;
-  });
+/** The settings record may legitimately not exist yet ({ data: null }). */
+function readSettingsRow(): Promise<DbResult<SettingsRow | null> | null> {
+  return cachedRead('settings', () =>
+    runAsGuest(async ({ client }, context) => {
+      const { data, errors } = await client.models.SiteSettings.get(
+        context,
+        { id: 'main' },
+        { authMode: 'identityPool' },
+      );
+      if (errors?.length) throw new Error(errors.map((e) => e.message).join('; '));
+      return { data };
+    }, 'settings read'),
+  );
 }
 
 /**
@@ -120,47 +167,42 @@ async function getSettingsRow(): Promise<SettingsRow | null> {
  * keep the highlights and any confirmed treatments of the matching static
  * service. Salon/home availability comes from the database when set (true or
  * false); otherwise from the static config, which leaves it undefined unless
- * explicitly confirmed. Nothing is assumed.
+ * explicitly confirmed. Nothing is assumed. With no rows (not imported yet) or
+ * a failed read, the static services are shown.
  */
-const loadServices = unstable_cache(
-  async (): Promise<Service[]> => {
-    const rows = await listServiceRows();
-    if (!rows || rows.length === 0) return staticServices;
+export const getServices = cache(async (): Promise<Service[]> => {
+  const rows = (await readServiceRows())?.data;
+  if (!rows || rows.length === 0) return staticServices;
 
-    const staticBySlug = new Map(staticServices.map((service) => [service.slug, service]));
-    const seen = new Set<string>();
+  const staticBySlug = new Map(staticServices.map((service) => [service.slug, service]));
+  const seen = new Set<string>();
 
-    return rows
-      .filter(isPublished)
-      .sort(bySortOrder)
-      .flatMap((row): Service[] => {
-        if (!row.slug || seen.has(row.slug)) return [];
-        seen.add(row.slug);
-        const base = staticBySlug.get(row.slug);
-        const name = localized(row.nameEn, row.nameAr) ?? base?.name;
-        if (!name) return [];
-        const summary = localized(row.summaryEn, row.summaryAr) ?? base?.summary ?? { en: '', ar: '' };
-        return [
-          {
-            slug: row.slug,
-            icon: isIconName(row.icon) ? row.icon : (base?.icon ?? 'sparkles'),
-            image: resolveMediaPath(row.imagePath),
-            name,
-            summary,
-            intro: localized(row.introEn, row.introAr) ?? base?.intro ?? summary,
-            highlights: base?.highlights ?? [],
-            items: base?.items,
-            availableAtSalon: optionalBoolean(row.availableAtSalon) ?? base?.availableAtSalon,
-            availableAtHome: optionalBoolean(row.availableAtHome) ?? base?.availableAtHome,
-          },
-        ];
-      });
-  },
-  ['soso-content', 'services'],
-  { revalidate: REVALIDATE_SECONDS, tags: ['services'] },
-);
-
-export const getServices = cache(() => loadServices());
+  return rows
+    .filter(isPublished)
+    .sort(bySortOrder)
+    .flatMap((row): Service[] => {
+      if (!row.slug || seen.has(row.slug)) return [];
+      seen.add(row.slug);
+      const base = staticBySlug.get(row.slug);
+      const name = localized(row.nameEn, row.nameAr) ?? base?.name;
+      if (!name) return [];
+      const summary = localized(row.summaryEn, row.summaryAr) ?? base?.summary ?? { en: '', ar: '' };
+      return [
+        {
+          slug: row.slug,
+          icon: isIconName(row.icon) ? row.icon : (base?.icon ?? 'sparkles'),
+          image: resolveMediaPath(row.imagePath),
+          name,
+          summary,
+          intro: localized(row.introEn, row.introAr) ?? base?.intro ?? summary,
+          highlights: base?.highlights ?? [],
+          items: base?.items,
+          availableAtSalon: optionalBoolean(row.availableAtSalon) ?? base?.availableAtSalon,
+          availableAtHome: optionalBoolean(row.availableAtHome) ?? base?.availableAtHome,
+        },
+      ];
+    });
+});
 
 export async function getService(slug: string): Promise<Service | undefined> {
   return (await getServices()).find((service) => service.slug === slug);
@@ -181,55 +223,43 @@ function fromStaticOffer(offer: OfferData): Offer {
 }
 
 /** Active offers in display order; empty until real offers exist. */
-const loadOffers = unstable_cache(
-  async (): Promise<Offer[]> => {
-    const rows = await listOfferRows();
-    if (!rows || rows.length === 0) return staticOffers.filter((offer) => offer.isActive).map(fromStaticOffer);
+export const getOffers = cache(async (): Promise<Offer[]> => {
+  const rows = (await readOfferRows())?.data;
+  if (!rows || rows.length === 0) return staticOffers.filter((offer) => offer.isActive).map(fromStaticOffer);
 
-    return rows
-      .filter(isPublished)
-      .sort(bySortOrder)
-      .flatMap((row): Offer[] => {
-        const title = localized(row.titleEn, row.titleAr);
-        if (!title) return [];
-        return [
-          {
-            id: row.id,
-            slug: row.id,
-            title,
-            description: localized(row.descriptionEn, row.descriptionAr),
-            badge: localized(row.badgeEn, row.badgeAr),
-            priceNow: price(row.priceNow),
-            priceWas: price(row.priceWas),
-            serviceSlug: row.serviceSlug || null,
-            image: resolveMediaPath(row.imagePath),
-          },
-        ];
-      });
-  },
-  ['soso-content', 'offers'],
-  { revalidate: REVALIDATE_SECONDS, tags: ['offers'] },
-);
-
-export const getOffers = cache(() => loadOffers());
+  return rows
+    .filter(isPublished)
+    .sort(bySortOrder)
+    .flatMap((row): Offer[] => {
+      const title = localized(row.titleEn, row.titleAr);
+      if (!title) return [];
+      return [
+        {
+          id: row.id,
+          slug: row.id,
+          title,
+          description: localized(row.descriptionEn, row.descriptionAr),
+          badge: localized(row.badgeEn, row.badgeAr),
+          priceNow: price(row.priceNow),
+          priceWas: price(row.priceWas),
+          serviceSlug: row.serviceSlug || null,
+          image: resolveMediaPath(row.imagePath),
+        },
+      ];
+    });
+});
 
 /** Contact details and hero media: database values first, then src/config/site.ts. */
-const loadSettings = unstable_cache(
-  async (): Promise<SiteSettings> => {
-    const row = await getSettingsRow();
-    const bundled = siteConfig.heroVideo;
-    const customVideo = resolveMediaPath(row?.heroVideoPath);
-    const customPoster = resolveMediaPath(row?.heroPosterPath);
+export const getSettings = cache(async (): Promise<SiteSettings> => {
+  const row = (await readSettingsRow())?.data;
+  const bundled = siteConfig.heroVideo;
+  const customVideo = resolveMediaPath(row?.heroVideoPath);
+  const customPoster = resolveMediaPath(row?.heroPosterPath);
 
-    return {
-      ...toContactDetails(row, siteConfig),
-      heroVideo: customVideo
-        ? { mp4: customVideo, webm: null, poster: customPoster }
-        : { mp4: bundled.mp4, webm: bundled.webm, poster: customPoster ?? bundled.poster },
-    };
-  },
-  ['soso-content', 'settings'],
-  { revalidate: REVALIDATE_SECONDS, tags: ['settings'] },
-);
-
-export const getSettings = cache(() => loadSettings());
+  return {
+    ...toContactDetails(row, siteConfig),
+    heroVideo: customVideo
+      ? { mp4: customVideo, webm: null, poster: customPoster }
+      : { mp4: bundled.mp4, webm: bundled.webm, poster: customPoster ?? bundled.poster },
+  };
+});

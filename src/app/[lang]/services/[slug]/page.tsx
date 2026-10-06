@@ -13,16 +13,10 @@ import { getService, getServices } from '@/lib/content';
 import { siteConfig } from '@/config/site';
 import { pageMetadata } from '@/lib/seo';
 
-export const revalidate = 60;
-// Services added from /admin after the build get their page on first request.
-export const dynamicParams = true;
+// Rendered on every request so admin edits show up within ~60 s (see lib/content.ts).
+export const dynamic = 'force-dynamic';
 
 type Params = Promise<{ lang: string; slug: string }>;
-
-export async function generateStaticParams() {
-  const services = await getServices();
-  return services.map((service) => ({ slug: service.slug }));
-}
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { locale, dict } = await resolveLocale(params);
