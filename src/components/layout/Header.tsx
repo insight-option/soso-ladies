@@ -21,7 +21,7 @@ export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
     <header className="sticky top-0 z-40 border-b border-line/80 bg-cream">
       <div className="container-page flex h-[4.5rem] items-center gap-3 lg:h-24 lg:gap-6">
         <Link href={homeHref} className="shrink-0 rounded-lg">
-          <Logo alt={dict.nav.homeLinkLabel} className="h-14 lg:h-[4.75rem]" sizes="(min-width: 1024px) 58px, 44px" preload />
+          <Logo alt={dict.nav.homeLinkLabel} className="h-14 lg:h-[4.75rem]" sizes="(min-width: 1024px) 58px, 44px" eager />
         </Link>
 
         <div className="flex flex-1 justify-center">

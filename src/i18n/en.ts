@@ -7,33 +7,35 @@ export const en = {
   meta: {
     siteName: 'SOSO Ladies Salon',
     defaultDescription:
-      'SOSO Ladies Salon in Doha, Qatar — professional facial, permanent makeup, hair, nails and henna services at our salon or in the comfort of your home.',
+      'SOSO Ladies Salon — professional facial, permanent makeup, hair, nails and henna services at our salon or in the comfort of your home.',
     home: {
       title: 'SOSO Ladies Salon — Your Beauty, Our Passion',
       description:
-        'Professional beauty services in Doha at our salon or in the comfort of your home. Contact SOSO Ladies Salon on WhatsApp or by phone.',
+        'Professional beauty services at our salon or in the comfort of your home. Contact SOSO Ladies Salon on WhatsApp or by phone.',
     },
     services: {
       title: 'Our Services',
       description:
-        'Facial, permanent makeup, hair, nails and henna at SOSO Ladies Salon, Doha. Contact us on WhatsApp for details.',
+        'Facial, permanent makeup, hair, nails and henna at SOSO Ladies Salon. Contact us on WhatsApp for details.',
     },
     offers: {
       title: 'Special Offers',
-      description: 'Exclusive beauty offers from SOSO Ladies Salon in Doha.',
+      description: 'Exclusive beauty offers from SOSO Ladies Salon.',
     },
     about: {
       title: 'About SOSO',
       description:
-        'Beauty, care and confidence for every woman. Learn about SOSO Ladies Salon in Doha, Qatar.',
+        'Beauty, care and confidence for every woman. Learn about SOSO Ladies Salon.',
     },
     contact: {
       title: 'Contact Us',
-      description: 'Contact SOSO Ladies Salon in Doha on WhatsApp or call +974 3342 8070.',
+      description: 'Contact SOSO Ladies Salon on WhatsApp or call {phone}.',
     },
     notFound: {
       title: 'Page not found',
     },
+    /** Service page title once siteConfig.city is set, e.g. "Facial in Doha". */
+    serviceTitle: '{name} in {city}',
   },
   nav: {
     home: 'Home',
@@ -59,12 +61,21 @@ export const en = {
     whatsappLabel: 'Chat with SOSO Ladies Salon on WhatsApp',
     callLabel: 'Call SOSO Ladies Salon',
     viewDetails: 'View Details',
+    availableAtHome: 'Available at home',
     viewAllServices: 'View All Services',
     viewAllOffers: 'View All Offers',
     breadcrumbLabel: 'Breadcrumb',
     currency: 'QAR',
     opensInNewTab: '(opens in a new tab)',
     quickContactLabel: 'Quick contact',
+  },
+  /** Prefilled WhatsApp messages; {service} / {offer} are filled per page. */
+  whatsappMessages: {
+    service: 'Hello SOSO Ladies Salon, I would like to ask about the {service} service.',
+    offer: 'Hello SOSO Ladies Salon, I would like to ask about the “{offer}” offer.',
+    latestOffers: 'Hello SOSO Ladies Salon, I would like to ask about your latest offers.',
+    salon: 'Hello SOSO Ladies Salon, I would like to ask about your salon services.',
+    home: 'Hello SOSO Ladies Salon, I would like to ask about your home service.',
   },
   hero: {
     eyebrow: 'Beauty Care',
@@ -88,13 +99,15 @@ export const en = {
     subtitle: 'Beauty services designed to make you look and feel your best.',
   },
   modes: {
-    title: 'At the salon or at home',
+    title: 'Beauty, Your Way',
+    subtitle: 'Visit us at the salon, or let us bring the salon to you.',
     salonTitle: 'Salon Service',
     salonText: 'Visit SOSO Ladies Salon for your beauty treatment.',
     salonImageAlt: 'Hair styling at SOSO Ladies Salon',
     homeTitle: 'Home Service',
     homeText: 'Enjoy professional beauty services in the comfort of your home.',
     homeImageAlt: 'A SOSO beautician with a client at home',
+    homeServicesLabel: 'Services available at home',
   },
   offersSection: {
     title: 'Special Offers',
@@ -113,6 +126,9 @@ export const en = {
   },
   serviceDetail: {
     highlightsTitle: 'What to expect',
+    availabilityTitle: 'Where the service is available',
+    availableSalon: 'At the salon',
+    availableHome: 'At your home',
     itemsTitle: 'Our {name} Services',
     otherServices: 'Other Services',
     ctaTitle: 'Interested in {name}?',
@@ -121,9 +137,10 @@ export const en = {
   offersPage: {
     title: 'Special Offers',
     subtitle: 'Exclusive beauty offers for a more beautiful you.',
-    emptyTitle: 'New offers are coming soon',
-    emptyText:
-      'There are no offers running right now. Message us on WhatsApp to ask about our latest services.',
+    emptyTitle: 'New offers coming soon',
+    emptyText: 'Stay tuned for the latest SOSO offers.',
+    emptyCta: 'Contact us on WhatsApp',
+    emptyServices: 'Meanwhile, explore our services',
   },
   about: {
     title: 'About SOSO',
@@ -149,7 +166,8 @@ export const en = {
   },
   footer: {
     tagline: 'Professional beauty services at our salon or in the comfort of your home.',
-    location: 'Doha, Qatar',
+    /** Shown only once siteConfig.city is set. */
+    location: '{city}, {country}',
     explore: 'Explore',
     services: 'Services',
     contact: 'Contact',

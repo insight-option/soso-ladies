@@ -42,6 +42,7 @@ npx npm@10 ci
 | Phone / WhatsApp | `src/config/site.ts` | Fixed: `+974 3342 8070`. Never editable from `/admin`. |
 | Address, hours, Instagram, email, map | `src/config/site.ts` or `/admin → بيانات التواصل` | `null` = hidden on the site. Nothing is invented. |
 | Services | `src/config/services.ts` or `/admin → الخدمات` | One object = card, detail page, sitemap entry and footer link. |
+| Salon / home availability | `/admin → الخدمات → أماكن تقديم الخدمة` | Per service (`availableAtSalon`, `availableAtHome`). Not set = nothing shown; only enabled options appear on the site. Never assumed or imported. |
 | Offers | `src/config/offers.ts` or `/admin → العروض` | Empty → Offers page shows "coming soon", Home hides the section. |
 | Hero video / poster | `public/video/` or `/admin → الوسائط` | Bundled files are the default. |
 

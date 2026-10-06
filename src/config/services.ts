@@ -8,7 +8,7 @@ export type ServiceHighlight = {
 
 export type ServiceItem = {
   name: Localized;
-  summary: Localized;
+  summary?: Localized;
 };
 
 export type ServiceDefinition = {
@@ -21,14 +21,23 @@ export type ServiceDefinition = {
   summary: Localized;
   intro: Localized;
   highlights: ServiceHighlight[];
-  /** Optional sub-services; the section is hidden when empty. */
-  items: ServiceItem[];
+  /** Confirmed treatments only. Leave out until confirmed: the list is hidden. */
+  items?: ServiceItem[];
+  /**
+   * Where the service is offered. Normally set per service in /admin (database
+   * values win); leave out here unless confirmed. Only `true` is shown on the site.
+   */
+  availableAtSalon?: boolean;
+  availableAtHome?: boolean;
 };
 
 /**
  * The built-in services. Adding one object here adds its card, detail page,
  * sitemap entry and footer link. When the admin database has services, they
  * take over (matched by slug) and these highlights/items are kept.
+ * Only confirmed details are listed: the Facial treatments come from the approved
+ * reference; other treatment lists are added once confirmed. Salon/home
+ * availability is managed per service in /admin and is not assumed here.
  */
 export const services: ServiceDefinition[] = [
   {
@@ -87,7 +96,6 @@ export const services: ServiceDefinition[] = [
       { icon: 'gem', label: { en: 'Professional techniques', ar: 'تقنيات احترافية' } },
       { icon: 'heart', label: { en: 'Applied with care', ar: 'تطبيق بعناية' } },
     ],
-    items: [],
   },
   {
     slug: 'hair',
@@ -102,12 +110,7 @@ export const services: ServiceDefinition[] = [
       en: 'From a fresh cut to styling and color, our team takes care of your hair to enhance your natural beauty.',
       ar: 'من القصّ إلى التصفيف والصبغ، يعتني فريقنا بشعرك ليبرز جمالك الطبيعي.',
     },
-    highlights: [
-      { icon: 'scissors', label: { en: 'Cut', ar: 'قصّ' } },
-      { icon: 'wind', label: { en: 'Styling', ar: 'تصفيف' } },
-      { icon: 'palette', label: { en: 'Color', ar: 'صبغ' } },
-    ],
-    items: [],
+    highlights: [],
   },
   {
     slug: 'nails',
@@ -122,12 +125,7 @@ export const services: ServiceDefinition[] = [
       en: 'Beautiful, well-groomed hands and feet with manicure, pedicure and nail art.',
       ar: 'يدان وقدمان بإطلالة أنيقة ومُعتنى بها مع المانيكير والباديكير وفنّ الأظافر.',
     },
-    highlights: [
-      { icon: 'hand', label: { en: 'Manicure', ar: 'مانيكير' } },
-      { icon: 'sparkles', label: { en: 'Pedicure', ar: 'باديكير' } },
-      { icon: 'brush', label: { en: 'Nail art', ar: 'فنّ الأظافر' } },
-    ],
-    items: [],
+    highlights: [],
   },
   {
     slug: 'henna',
@@ -142,11 +140,6 @@ export const services: ServiceDefinition[] = [
       en: 'Elegant henna designs, from traditional patterns to modern styles, for every occasion.',
       ar: 'نقوش حناء أنيقة، من الزخارف التقليدية إلى الأنماط العصرية، لكل مناسبة.',
     },
-    highlights: [
-      { icon: 'flower', label: { en: 'Traditional designs', ar: 'نقوش تقليدية' } },
-      { icon: 'sparkles', label: { en: 'Modern designs', ar: 'نقوش عصرية' } },
-      { icon: 'heart', label: { en: 'For all occasions', ar: 'لجميع المناسبات' } },
-    ],
-    items: [],
+    highlights: [],
   },
 ];

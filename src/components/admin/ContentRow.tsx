@@ -16,6 +16,7 @@ export function ContentRow({
   placeholderIcon,
   title,
   subtitle,
+  badges = [],
   published,
   onTogglePublished,
   onEdit,
@@ -27,6 +28,8 @@ export function ContentRow({
   placeholderIcon: IconName;
   title: string;
   subtitle: ReactNode;
+  /** Small labels under the subtitle (e.g. where a service is offered). */
+  badges?: string[];
   published: boolean;
   onTogglePublished: (published: boolean) => void;
   onEdit: () => void;
@@ -54,6 +57,15 @@ export function ContentRow({
       <div className="min-w-[8rem] flex-1">
         <p className="truncate font-semibold text-plum">{title}</p>
         <div className="truncate text-xs text-muted">{subtitle}</div>
+        {badges.length > 0 ? (
+          <div className="mt-1.5 flex flex-wrap gap-1">
+            {badges.map((badge) => (
+              <span key={badge} className="rounded-full bg-blush px-2 py-0.5 text-[0.6875rem] font-medium text-plum">
+                {badge}
+              </span>
+            ))}
+          </div>
+        ) : null}
       </div>
       <div className="ms-auto flex items-center gap-1">
         <span className={cx('me-1 hidden text-xs sm:inline', published ? 'text-magenta' : 'text-muted')}>

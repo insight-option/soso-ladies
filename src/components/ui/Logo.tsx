@@ -11,12 +11,16 @@ export function Logo({
   className,
   sizes = '64px',
   preload = false,
+  eager = false,
 }: {
   alt: string;
   /** Set the height (e.g. h-16); width follows the logo's proportions. */
   className?: string;
   sizes?: string;
+  /** Preload (only where the logo is the main visual, e.g. the admin sign-in). */
   preload?: boolean;
+  /** Load immediately without a preload hint (above-the-fold header logo). */
+  eager?: boolean;
 }) {
   return (
     <Image
@@ -26,6 +30,7 @@ export function Logo({
       height={HEIGHT}
       sizes={sizes}
       preload={preload}
+      loading={eager && !preload ? 'eager' : undefined}
       className={cx('w-auto mix-blend-multiply select-none', className)}
     />
   );

@@ -3,6 +3,7 @@ import { WhatsAppButton } from '@/components/cta/ContactLinks';
 import { CtaBanner } from '@/components/sections/CtaBanner';
 import { OfferCard } from '@/components/sections/OfferCard';
 import { PageHeader } from '@/components/sections/PageHeader';
+import { ServiceCard } from '@/components/sections/ServiceCard';
 import { Icon } from '@/components/ui/Icon';
 import { resolveLocale, type LangParams } from '@/i18n/params';
 import { localizePath } from '@/i18n/routes';
@@ -35,38 +36,76 @@ export default async function OffersPage({ params }: { params: LangParams }) {
         subtitle={dict.offersPage.subtitle}
       />
 
-      <div className="container-page">
-        {offers.length > 0 ? (
-          <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {offers.map((offer) => (
-              <li key={offer.id}>
-                <OfferCard
-                  offer={offer}
-                  service={offer.serviceSlug ? servicesBySlug.get(offer.serviceSlug) : undefined}
-                  locale={locale}
-                  dict={dict}
-                  headingLevel="h2"
-                />
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <div className="mx-auto max-w-xl rounded-card bg-white px-6 py-12 text-center shadow-soft ring-1 ring-line/70 sm:px-10">
-            <span className="mx-auto grid size-16 place-items-center rounded-full bg-blush text-magenta">
-              <Icon name="tag" className="size-7" />
-            </span>
-            <h2 className="mt-5 text-[1.75rem] leading-tight sm:text-3xl">{dict.offersPage.emptyTitle}</h2>
-            <p className="mt-3 text-muted">{dict.offersPage.emptyText}</p>
-            <WhatsAppButton
-              label={dict.common.askOnWhatsApp}
-              newTabHint={dict.common.opensInNewTab}
-              className="mt-7"
-            />
+      {offers.length > 0 ? (
+        <>
+          <div className="container-page">
+            <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {offers.map((offer) => (
+                <li key={offer.id}>
+                  <OfferCard
+                    offer={offer}
+                    service={offer.serviceSlug ? servicesBySlug.get(offer.serviceSlug) : undefined}
+                    locale={locale}
+                    dict={dict}
+                    headingLevel="h2"
+                  />
+                </li>
+              ))}
+            </ul>
           </div>
-        )}
-      </div>
+          <CtaBanner dict={dict} />
+        </>
+      ) : (
+        <>
+          {/* No active offers: an intentional "coming soon" panel, never an empty grid. */}
+          <section aria-labelledby="offers-soon-title" className="container-page">
+            <div className="relative overflow-hidden rounded-[1.75rem] bg-blush px-6 py-12 text-center sm:px-12 sm:py-16">
+              <Icon
+                name="lotus"
+                className="pointer-events-none absolute -start-10 -top-10 size-44 text-blush-deep sm:size-56"
+              />
+              <Icon
+                name="lotus"
+                className="pointer-events-none absolute -end-8 -bottom-12 size-40 text-blush-deep sm:size-52"
+              />
+              <div className="relative mx-auto max-w-lg">
+                <span className="mx-auto grid size-16 place-items-center rounded-full bg-white text-magenta shadow-soft">
+                  <Icon name="tag" className="size-7" />
+                </span>
+                <h2 id="offers-soon-title" className="mt-6 text-[2rem] leading-tight sm:text-[2.5rem]">
+                  {dict.offersPage.emptyTitle}
+                </h2>
+                <p className="mt-3 text-lg text-muted">{dict.offersPage.emptyText}</p>
+                <WhatsAppButton
+                  label={dict.offersPage.emptyCta}
+                  newTabHint={dict.common.opensInNewTab}
+                  message={dict.whatsappMessages.latestOffers}
+                  className="mt-8"
+                />
+              </div>
+            </div>
+          </section>
 
-      {offers.length > 0 ? <CtaBanner dict={dict} /> : null}
+          <section aria-labelledby="offers-services-title" className="container-page pt-14 sm:pt-16">
+            <h2 id="offers-services-title" className="text-[1.75rem] leading-tight sm:text-[2rem]">
+              {dict.offersPage.emptyServices}
+            </h2>
+            <ul className="mt-6 grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-5">
+              {services.map((service) => (
+                <li key={service.slug}>
+                  <ServiceCard
+                    service={service}
+                    locale={locale}
+                    detailsLabel={dict.common.viewDetails}
+                    homeLabel={dict.common.availableAtHome}
+                    sizes="(min-width: 1216px) 220px, (min-width: 1024px) 19vw, (min-width: 768px) 31vw, 47vw"
+                  />
+                </li>
+              ))}
+            </ul>
+          </section>
+        </>
+      )}
     </>
   );
 }

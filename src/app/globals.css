@@ -13,9 +13,10 @@
   --color-ink: #2b2326;
   --color-muted: #6c6165;
   --color-line: #ebe0dd;
-  /* Logo gold: decorative only. gold-ink is the AA-contrast tone for small text. */
+  /* Logo gold: decorative only. gold-ink is the AA-contrast tone for small text
+     (≥ 4.8:1 on cream, white and blush). */
   --color-gold: #c8a04d;
-  --color-gold-ink: #8c6a24;
+  --color-gold-ink: #83631f;
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, 'Segoe UI', Arial, sans-serif;
   --font-display: var(--font-playfair), Georgia, 'Times New Roman', serif;
@@ -103,9 +104,10 @@ html:lang(ar) {
   }
 }
 
-/* Space reserved at the bottom of the page for the mobile sticky CTA bar. */
+/* Space reserved at the bottom of the page for the mobile sticky CTA bar
+   (bar: 0.5rem + 2.75rem button + 0.5rem, plus the safe area). */
 @utility pb-cta-bar {
-  padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+  padding-bottom: calc(4.25rem + env(safe-area-inset-bottom));
 
   @media (width >= 64rem) {
     padding-bottom: 0;

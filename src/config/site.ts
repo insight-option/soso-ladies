@@ -8,7 +8,12 @@ import type { Localized } from '@/i18n/config';
 export const siteConfig = {
   name: { en: 'SOSO Ladies Salon', ar: 'سوسو صالون نسائي' } satisfies Localized,
   url: process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000',
-  city: { en: 'Doha', ar: 'الدوحة' } satisfies Localized,
+  /**
+   * City, once confirmed by the salon, e.g. { en: 'Doha', ar: 'الدوحة' }. While
+   * null it is left out of page titles, structured data and the location line.
+   */
+  city: null as Localized | null,
+  country: { en: 'Qatar', ar: 'قطر' } satisfies Localized,
   countryCode: 'QA',
 
   phone: {

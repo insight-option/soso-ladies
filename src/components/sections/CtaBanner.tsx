@@ -7,10 +7,13 @@ export function CtaBanner({
   dict,
   title = dict.ctaBanner.title,
   text = dict.ctaBanner.text,
+  whatsappMessage,
 }: {
   dict: Dictionary;
   title?: string;
   text?: string;
+  /** Prefilled WhatsApp message (e.g. the service on a detail page). */
+  whatsappMessage?: string;
 }) {
   return (
     <section aria-labelledby="cta-title" className="container-page mt-16 sm:mt-24">
@@ -29,6 +32,7 @@ export function CtaBanner({
           <WhatsAppButton
             label={dict.common.whatsapp}
             newTabHint={dict.common.opensInNewTab}
+            message={whatsappMessage}
             full
             className="sm:w-auto sm:px-5"
           />

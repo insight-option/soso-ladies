@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { WhatsAppButton } from '@/components/cta/ContactLinks';
 import { MediaImage } from '@/components/ui/MediaImage';
 import type { Locale } from '@/i18n/config';
-import type { Dictionary } from '@/i18n/dictionaries';
+import { format, type Dictionary } from '@/i18n/dictionaries';
 import { localizePath } from '@/i18n/routes';
 import type { Offer, Service } from '@/lib/content';
 
@@ -26,7 +26,10 @@ export function OfferCard({
   headingLevel?: 'h2' | 'h3';
 }) {
   return (
-    <article className="flex h-full flex-col overflow-hidden rounded-card bg-white shadow-soft ring-1 ring-line/70">
+    <article
+      id={offer.slug}
+      className="flex h-full scroll-mt-28 flex-col overflow-hidden rounded-card bg-white shadow-soft ring-1 ring-line/70"
+    >
       <div className="relative">
         <MediaImage
           src={offer.image}
@@ -72,6 +75,7 @@ export function OfferCard({
           <WhatsAppButton
             label={dict.offersSection.getOffer}
             newTabHint={dict.common.opensInNewTab}
+            message={format(dict.whatsappMessages.offer, { offer: offer.title[locale] })}
             size="sm"
             full
           />

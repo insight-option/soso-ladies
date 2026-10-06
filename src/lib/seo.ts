@@ -77,7 +77,7 @@ export function beautySalonJsonLd(locale: Locale, settings: SiteSettings) {
     address: {
       '@type': 'PostalAddress',
       ...(settings.address ? { streetAddress: settings.address[locale] } : {}),
-      addressLocality: siteConfig.city[locale],
+      ...(siteConfig.city ? { addressLocality: siteConfig.city[locale] } : {}),
       addressCountry: siteConfig.countryCode,
     },
     ...(settings.email ? { email: settings.email } : {}),

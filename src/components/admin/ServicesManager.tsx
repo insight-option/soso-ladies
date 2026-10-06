@@ -30,6 +30,8 @@ export function ServicesManager() {
     try {
       const existing = new Set(services.map((service) => service.slug));
       const created: ServiceRow[] = [];
+      // Availability (availableAtSalon/availableAtHome) is deliberately not imported:
+      // it stays null ("not set") until the owner chooses it in the service form.
       for (const [index, seed] of seedServices.entries()) {
         if (existing.has(seed.slug)) continue;
         created.push(must(await client.models.Service.create({ ...seed, sortOrder: index, published: true })));
@@ -104,6 +106,10 @@ export function ServicesManager() {
                   {service.nameEn} · /services/{service.slug}
                 </span>
               }
+              badges={[
+                ...(service.availableAtSalon === true ? [t.services.badgeSalon] : []),
+                ...(service.availableAtHome === true ? [t.services.badgeHome] : []),
+              ]}
               published={service.published !== false}
               onTogglePublished={(published) => void actions.togglePublished(service, published)}
               onEdit={() => setEditing(service)}
