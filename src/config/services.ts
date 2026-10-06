@@ -8,7 +8,13 @@ export type ServiceHighlight = {
 
 export type ServiceItem = {
   name: Localized;
-  summary: Localized;
+  summary?: Localized;
+};
+
+/** Where the service is offered. */
+export type ServiceAvailability = {
+  salon: boolean;
+  home: boolean;
 };
 
 export type ServiceDefinition = {
@@ -21,14 +27,19 @@ export type ServiceDefinition = {
   summary: Localized;
   intro: Localized;
   highlights: ServiceHighlight[];
-  /** Optional sub-services; the section is hidden when empty. */
+  /** Treatments offered under this service; the list is hidden when empty. */
   items: ServiceItem[];
+  availability: ServiceAvailability;
 };
+
+/** The salon offers both salon and home visits; confirm per service with the salon. */
+const salonAndHome: ServiceAvailability = { salon: true, home: true };
 
 /**
  * The built-in services. Adding one object here adds its card, detail page,
  * sitemap entry and footer link. When the admin database has services, they
- * take over (matched by slug) and these highlights/items are kept.
+ * take over (matched by slug) and these highlights/items/availability are kept.
+ * Treatment lists come from the approved design reference; nothing else is assumed.
  */
 export const services: ServiceDefinition[] = [
   {
@@ -68,6 +79,7 @@ export const services: ServiceDefinition[] = [
         summary: { en: 'For clearer and healthier skin', ar: 'لبشرة أنقى وأكثر صحة' },
       },
     ],
+    availability: salonAndHome,
   },
   {
     slug: 'permanent-makeup',
@@ -87,7 +99,11 @@ export const services: ServiceDefinition[] = [
       { icon: 'gem', label: { en: 'Professional techniques', ar: 'تقنيات احترافية' } },
       { icon: 'heart', label: { en: 'Applied with care', ar: 'تطبيق بعناية' } },
     ],
-    items: [],
+    items: [
+      { name: { en: 'Eyebrows', ar: 'الحواجب' } },
+      { name: { en: 'Touch-up sessions', ar: 'جلسات التعديل (الرتوش)' } },
+    ],
+    availability: salonAndHome,
   },
   {
     slug: 'hair',
@@ -102,12 +118,13 @@ export const services: ServiceDefinition[] = [
       en: 'From a fresh cut to styling and color, our team takes care of your hair to enhance your natural beauty.',
       ar: 'من القصّ إلى التصفيف والصبغ، يعتني فريقنا بشعرك ليبرز جمالك الطبيعي.',
     },
-    highlights: [
-      { icon: 'scissors', label: { en: 'Cut', ar: 'قصّ' } },
-      { icon: 'wind', label: { en: 'Styling', ar: 'تصفيف' } },
-      { icon: 'palette', label: { en: 'Color', ar: 'صبغ' } },
+    highlights: [],
+    items: [
+      { name: { en: 'Haircut', ar: 'قصّ الشعر' } },
+      { name: { en: 'Hair styling', ar: 'تصفيف الشعر' } },
+      { name: { en: 'Hair coloring', ar: 'صبغ الشعر' } },
     ],
-    items: [],
+    availability: salonAndHome,
   },
   {
     slug: 'nails',
@@ -122,12 +139,13 @@ export const services: ServiceDefinition[] = [
       en: 'Beautiful, well-groomed hands and feet with manicure, pedicure and nail art.',
       ar: 'يدان وقدمان بإطلالة أنيقة ومُعتنى بها مع المانيكير والباديكير وفنّ الأظافر.',
     },
-    highlights: [
-      { icon: 'hand', label: { en: 'Manicure', ar: 'مانيكير' } },
-      { icon: 'sparkles', label: { en: 'Pedicure', ar: 'باديكير' } },
-      { icon: 'brush', label: { en: 'Nail art', ar: 'فنّ الأظافر' } },
+    highlights: [],
+    items: [
+      { name: { en: 'Manicure', ar: 'مانيكير' } },
+      { name: { en: 'Pedicure', ar: 'باديكير' } },
+      { name: { en: 'Nail art', ar: 'فنّ الأظافر' } },
     ],
-    items: [],
+    availability: salonAndHome,
   },
   {
     slug: 'henna',
@@ -142,11 +160,11 @@ export const services: ServiceDefinition[] = [
       en: 'Elegant henna designs, from traditional patterns to modern styles, for every occasion.',
       ar: 'نقوش حناء أنيقة، من الزخارف التقليدية إلى الأنماط العصرية، لكل مناسبة.',
     },
-    highlights: [
-      { icon: 'flower', label: { en: 'Traditional designs', ar: 'نقوش تقليدية' } },
-      { icon: 'sparkles', label: { en: 'Modern designs', ar: 'نقوش عصرية' } },
-      { icon: 'heart', label: { en: 'For all occasions', ar: 'لجميع المناسبات' } },
+    highlights: [],
+    items: [
+      { name: { en: 'Traditional henna designs', ar: 'نقوش حناء تقليدية' } },
+      { name: { en: 'Modern henna designs', ar: 'نقوش حناء عصرية' } },
     ],
-    items: [],
+    availability: salonAndHome,
   },
 ];

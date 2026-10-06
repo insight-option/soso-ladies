@@ -3,6 +3,8 @@ import { ContactList } from '@/components/cta/ContactList';
 import { CallButton, WhatsAppButton } from '@/components/cta/ContactLinks';
 import { PageHeader } from '@/components/sections/PageHeader';
 import { Logo } from '@/components/ui/Logo';
+import { siteConfig } from '@/config/site';
+import { format } from '@/i18n/dictionaries';
 import { resolveLocale, type LangParams } from '@/i18n/params';
 import { localizePath } from '@/i18n/routes';
 import { getSettings } from '@/lib/content';
@@ -16,7 +18,7 @@ export async function generateMetadata({ params }: { params: LangParams }): Prom
     locale,
     path: '/contact',
     title: dict.meta.contact.title,
-    description: dict.meta.contact.description,
+    description: format(dict.meta.contact.description, { phone: siteConfig.phone.display }),
   });
 }
 

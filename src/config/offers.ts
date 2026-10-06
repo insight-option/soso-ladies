@@ -1,23 +1,28 @@
-import type { Localized } from '@/i18n/config';
-
-export type OfferDefinition = {
+/**
+ * Static offers, in the same shape the salon would supply them. Only real
+ * offers go here — never invent prices. An empty list (or no active offer)
+ * shows the "New offers coming soon" state on /offers and hides the Home
+ * section. Offers created in /admin replace this list.
+ */
+export type OfferData = {
   id: string;
-  title: Localized;
-  description: Localized | null;
-  /** Small label on the card, e.g. "Limited Time Offer". */
-  badge: Localized | null;
-  /** Prices in QAR. Only shown when supplied. */
-  priceNow: number | null;
-  priceWas: number | null;
-  /** Links the offer to a service detail page. */
-  serviceSlug: string | null;
-  /** Path under /public, or null for the placeholder. */
-  image: string | null;
+  /** Anchor on the Offers page: /offers#<slug>. Lowercase letters, digits and dashes. */
+  slug: string;
+  titleAr: string;
+  titleEn: string;
+  descriptionAr?: string;
+  descriptionEn?: string;
+  /** Path under /public (e.g. /images/offers/glow.webp); omit for the placeholder. */
+  image?: string;
+  /** Prices in QAR, shown only when supplied. */
+  originalPrice?: number;
+  offerPrice?: number;
+  /** Small label on the card, e.g. "Limited time". */
+  badgeAr?: string;
+  badgeEn?: string;
+  /** Slug of the related service (links the card to /services/<slug>). */
+  service?: string;
+  isActive: boolean;
 };
 
-/**
- * Real offers only. Empty until the salon supplies one: the Offers page then
- * shows a friendly empty state and the Home page hides its offers section.
- * Offers added from /admin replace this list.
- */
-export const offers: OfferDefinition[] = [];
+export const offers: OfferData[] = [];

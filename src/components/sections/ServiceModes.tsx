@@ -1,11 +1,20 @@
 import { WhatsAppButton } from '@/components/cta/ContactLinks';
 import { Icon, type IconName } from '@/components/ui/Icon';
 import { MediaImage } from '@/components/ui/MediaImage';
+import { SectionHeading } from '@/components/ui/SectionHeading';
 import type { Dictionary } from '@/i18n/dictionaries';
 
-/** "Salon Service" and "Home Service" cards on the Home page. */
+/** "Beauty, Your Way": salon visit or home service, each with its own WhatsApp CTA. */
 export function ServiceModes({ dict }: { dict: Dictionary }) {
-  const modes: Array<{ key: string; icon: IconName; image: string; alt: string; title: string; text: string }> = [
+  const modes: Array<{
+    key: string;
+    icon: IconName;
+    image: string;
+    alt: string;
+    title: string;
+    text: string;
+    message: string;
+  }> = [
     {
       key: 'salon',
       icon: 'chair',
@@ -13,6 +22,7 @@ export function ServiceModes({ dict }: { dict: Dictionary }) {
       alt: dict.modes.salonImageAlt,
       title: dict.modes.salonTitle,
       text: dict.modes.salonText,
+      message: dict.whatsappMessages.salon,
     },
     {
       key: 'home',
@@ -21,15 +31,14 @@ export function ServiceModes({ dict }: { dict: Dictionary }) {
       alt: dict.modes.homeImageAlt,
       title: dict.modes.homeTitle,
       text: dict.modes.homeText,
+      message: dict.whatsappMessages.home,
     },
   ];
 
   return (
     <section aria-labelledby="modes-title" className="container-page">
-      <h2 id="modes-title" className="sr-only">
-        {dict.modes.title}
-      </h2>
-      <div className="grid gap-5 md:grid-cols-2 lg:gap-7">
+      <SectionHeading id="modes-title" title={dict.modes.title} subtitle={dict.modes.subtitle} />
+      <div className="mt-8 grid gap-5 sm:mt-10 md:grid-cols-2 lg:gap-7">
         {modes.map((mode) => (
           <article
             key={mode.key}
@@ -50,6 +59,7 @@ export function ServiceModes({ dict }: { dict: Dictionary }) {
               <WhatsAppButton
                 label={dict.common.whatsapp}
                 newTabHint={dict.common.opensInNewTab}
+                message={mode.message}
                 size="sm"
                 className="mt-auto"
               />

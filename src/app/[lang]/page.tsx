@@ -50,6 +50,7 @@ export default async function HomePage({ params }: { params: LangParams }) {
               <ServiceCard
                 service={service}
                 locale={locale}
+                detailsLabel={dict.common.viewDetails}
                 sizes="(min-width: 1216px) 220px, (min-width: 1024px) 19vw, (min-width: 768px) 31vw, 47vw"
               />
             </li>

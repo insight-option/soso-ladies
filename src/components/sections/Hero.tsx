@@ -10,26 +10,35 @@ export function Hero({ dict, video }: { dict: Dictionary; video: SiteSettings['h
 
   return (
     <section aria-labelledby="hero-title">
-      <div className="container-page grid items-center gap-10 pt-8 pb-12 sm:pt-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.12fr)] lg:gap-14 lg:pt-14 lg:pb-16">
+      <div className="container-page grid items-center gap-7 pt-6 pb-10 sm:gap-10 sm:pt-12 sm:pb-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.12fr)] lg:gap-14 lg:pt-14 lg:pb-16">
         <div className="max-w-xl">
           <p className="eyebrow">{dict.hero.eyebrow}</p>
+          {/* Two lines visually; the space keeps "جمالك، شغفنا" / "Your Beauty, Our Passion" intact
+              for screen readers, copy/paste and search engines. */}
           <h1
             id="hero-title"
-            className="mt-5 text-[2.6rem] leading-[1.06] min-[400px]:text-5xl sm:text-6xl lg:text-[4.25rem]"
+            className="mt-4 text-[2.5rem] leading-[1.08] min-[400px]:text-5xl sm:mt-5 sm:text-6xl lg:text-[4.25rem]"
           >
-            <span className="block">{dict.hero.titleLine1}</span>
+            <span className="block">{dict.hero.titleLine1}</span>{' '}
             <span className="block text-magenta">{dict.hero.titleLine2}</span>
           </h1>
-          <p className="mt-5 max-w-md text-lg text-muted sm:text-xl">{dict.hero.subtitle}</p>
-          <div className="mt-8 grid grid-cols-2 gap-3 sm:flex sm:flex-wrap">
+          <p className="mt-4 max-w-md text-[1.0625rem] leading-relaxed text-muted sm:mt-5 sm:text-xl">
+            {dict.hero.subtitle}
+          </p>
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:mt-8 sm:flex sm:flex-wrap">
             <WhatsAppButton
               label={dict.common.whatsapp}
               newTabHint={dict.common.opensInNewTab}
-              size="lg"
+              size="md"
               full
-              className="sm:w-auto sm:px-7"
+              className="sm:h-13 sm:w-auto sm:px-7 sm:text-base"
             />
-            <CallButton label={dict.common.callNow} size="lg" full className="sm:w-auto sm:px-7" />
+            <CallButton
+              label={dict.common.callNow}
+              size="md"
+              full
+              className="sm:h-13 sm:w-auto sm:px-7 sm:text-base"
+            />
           </div>
         </div>
 

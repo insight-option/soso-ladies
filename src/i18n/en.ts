@@ -29,11 +29,13 @@ export const en = {
     },
     contact: {
       title: 'Contact Us',
-      description: 'Contact SOSO Ladies Salon in Doha on WhatsApp or call +974 3342 8070.',
+      description: 'Contact SOSO Ladies Salon in Doha on WhatsApp or call {phone}.',
     },
     notFound: {
       title: 'Page not found',
     },
+    /** Title of each service page, e.g. "Facial in Doha". */
+    serviceTitle: '{name} in Doha',
   },
   nav: {
     home: 'Home',
@@ -66,6 +68,14 @@ export const en = {
     opensInNewTab: '(opens in a new tab)',
     quickContactLabel: 'Quick contact',
   },
+  /** Prefilled WhatsApp messages; {service} / {offer} are filled per page. */
+  whatsappMessages: {
+    service: 'Hello SOSO Ladies Salon, I would like to ask about the {service} service.',
+    offer: 'Hello SOSO Ladies Salon, I would like to ask about the “{offer}” offer.',
+    latestOffers: 'Hello SOSO Ladies Salon, I would like to ask about your latest offers.',
+    salon: 'Hello SOSO Ladies Salon, I would like to ask about your salon services.',
+    home: 'Hello SOSO Ladies Salon, I would like to ask about your home service.',
+  },
   hero: {
     eyebrow: 'Beauty Care',
     titleLine1: 'Your Beauty,',
@@ -88,7 +98,8 @@ export const en = {
     subtitle: 'Beauty services designed to make you look and feel your best.',
   },
   modes: {
-    title: 'At the salon or at home',
+    title: 'Beauty, Your Way',
+    subtitle: 'Visit us at the salon, or let us bring the salon to you.',
     salonTitle: 'Salon Service',
     salonText: 'Visit SOSO Ladies Salon for your beauty treatment.',
     salonImageAlt: 'Hair styling at SOSO Ladies Salon',
@@ -113,6 +124,9 @@ export const en = {
   },
   serviceDetail: {
     highlightsTitle: 'What to expect',
+    availabilityTitle: 'Where we offer it',
+    availableSalon: 'At the salon',
+    availableHome: 'At your home',
     itemsTitle: 'Our {name} Services',
     otherServices: 'Other Services',
     ctaTitle: 'Interested in {name}?',
@@ -121,9 +135,10 @@ export const en = {
   offersPage: {
     title: 'Special Offers',
     subtitle: 'Exclusive beauty offers for a more beautiful you.',
-    emptyTitle: 'New offers are coming soon',
-    emptyText:
-      'There are no offers running right now. Message us on WhatsApp to ask about our latest services.',
+    emptyTitle: 'New offers coming soon',
+    emptyText: 'Stay tuned for the latest SOSO offers.',
+    emptyCta: 'Contact us on WhatsApp',
+    emptyServices: 'Meanwhile, explore our services',
   },
   about: {
     title: 'About SOSO',

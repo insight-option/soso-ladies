@@ -1,7 +1,7 @@
 import { cx } from '@/lib/cx';
 
 export type ButtonVariant = 'primary' | 'outline' | 'soft';
-export type ButtonSize = 'sm' | 'md' | 'lg';
+export type ButtonSize = 'sm' | 'compact' | 'md' | 'lg';
 
 const variants: Record<ButtonVariant, string> = {
   primary:
@@ -12,12 +12,14 @@ const variants: Record<ButtonVariant, string> = {
 
 const sizes: Record<ButtonSize, string> = {
   sm: 'h-10 text-sm gap-2',
+  compact: 'h-11 text-[0.9375rem] gap-2',
   md: 'h-12 text-[0.9375rem] gap-2.5',
   lg: 'h-13 text-base gap-2.5',
 };
 
 const padding: Record<ButtonSize, string> = {
   sm: 'px-4',
+  compact: 'px-4',
   md: 'px-5',
   lg: 'px-7',
 };

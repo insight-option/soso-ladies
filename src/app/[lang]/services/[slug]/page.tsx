@@ -4,7 +4,7 @@ import { CallButton, WhatsAppButton } from '@/components/cta/ContactLinks';
 import { CtaBanner } from '@/components/sections/CtaBanner';
 import { ServiceCard } from '@/components/sections/ServiceCard';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
-import { Icon } from '@/components/ui/Icon';
+import { Icon, type IconName } from '@/components/ui/Icon';
 import { MediaImage } from '@/components/ui/MediaImage';
 import { format } from '@/i18n/dictionaries';
 import { resolveLocale } from '@/i18n/params';
@@ -24,14 +24,14 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
-  const { locale } = await resolveLocale(params);
+  const { locale, dict } = await resolveLocale(params);
   const { slug } = await params;
   const service = await getService(slug);
   if (!service) return {};
   return pageMetadata({
     locale,
     path: `/services/${service.slug}`,
-    title: service.name[locale],
+    title: format(dict.meta.serviceTitle, { name: service.name[locale] }),
     description: service.intro[locale] || service.summary[locale],
     image: service.image,
   });
@@ -45,6 +45,11 @@ export default async function ServicePage({ params }: { params: Params }) {
 
   const others = services.filter((s) => s.slug !== service.slug);
   const name = service.name[locale];
+  const whatsappMessage = format(dict.whatsappMessages.service, { service: name });
+  const availability: Array<{ key: string; icon: IconName; label: string }> = [
+    ...(service.availability.salon ? [{ key: 'salon', icon: 'chair' as const, label: dict.serviceDetail.availableSalon }] : []),
+    ...(service.availability.home ? [{ key: 'home', icon: 'home' as const, label: dict.serviceDetail.availableHome }] : []),
+  ];
 
   return (
     <>
@@ -59,7 +64,17 @@ export default async function ServicePage({ params }: { params: Params }) {
         />
       </div>
 
-      <article className="container-page mt-6 grid gap-8 sm:mt-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:grid-rows-[auto_1fr] lg:gap-x-14 lg:gap-y-8">
+      <article className="container-page mt-5 grid gap-7 sm:mt-8 sm:gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:grid-rows-[auto_1fr] lg:gap-x-14 lg:gap-y-8">
+        {/* Hero image: first on mobile (shorter 4:3 crop), a tall 4:5 column on desktop. */}
+        <MediaImage
+          src={service.image}
+          alt={name}
+          icon={service.icon}
+          sizes="(min-width: 1216px) 500px, (min-width: 1024px) 42vw, 100vw"
+          preload
+          className="aspect-[4/3] rounded-[1.75rem] shadow-soft sm:aspect-[16/10] lg:sticky lg:top-32 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:aspect-[4/5] lg:self-start"
+        />
+
         <header className="lg:col-start-2 lg:row-start-1">
           <span className="inline-grid size-12 place-items-center rounded-full bg-blush text-magenta">
             <Icon name={service.icon} className="size-6" />
@@ -70,16 +85,7 @@ export default async function ServicePage({ params }: { params: Params }) {
           ) : null}
         </header>
 
-        <MediaImage
-          src={service.image}
-          alt={name}
-          icon={service.icon}
-          sizes="(min-width: 1216px) 500px, (min-width: 1024px) 42vw, 100vw"
-          preload
-          className="aspect-[4/5] rounded-[1.75rem] shadow-soft lg:sticky lg:top-32 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:self-start"
-        />
-
-        <div className="lg:col-start-2 lg:row-start-2">
+        <div className="space-y-10 lg:col-start-2 lg:row-start-2">
           {service.highlights.length > 0 ? (
             <section aria-labelledby="highlights-title">
               <h2 id="highlights-title" className="sr-only">
@@ -102,7 +108,7 @@ export default async function ServicePage({ params }: { params: Params }) {
           ) : null}
 
           {service.items.length > 0 ? (
-            <section aria-labelledby="items-title" className="mt-10">
+            <section aria-labelledby="items-title">
               <h2 id="items-title" className="text-[1.75rem] leading-tight sm:text-3xl">
                 {format(dict.serviceDetail.itemsTitle, { name })}
               </h2>
@@ -114,7 +120,7 @@ export default async function ServicePage({ params }: { params: Params }) {
                     </span>
                     <span className="min-w-0">
                       <span className="block font-semibold text-plum">{item.name[locale]}</span>
-                      <span className="block text-sm text-muted">{item.summary[locale]}</span>
+                      {item.summary ? <span className="block text-sm text-muted">{item.summary[locale]}</span> : null}
                     </span>
                   </li>
                 ))}
@@ -122,10 +128,33 @@ export default async function ServicePage({ params }: { params: Params }) {
             </section>
           ) : null}
 
-          <div className="mt-8 grid gap-3 sm:flex">
+          {availability.length > 0 ? (
+            <section aria-labelledby="availability-title">
+              <h2 id="availability-title" className="text-[1.375rem] leading-tight sm:text-2xl">
+                {dict.serviceDetail.availabilityTitle}
+              </h2>
+              <ul className="mt-4 flex flex-wrap gap-3">
+                {availability.map((option) => (
+                  <li
+                    key={option.key}
+                    className="flex items-center gap-2.5 rounded-full bg-white py-2 ps-2 pe-4 shadow-soft ring-1 ring-line/70"
+                  >
+                    <span className="grid size-9 place-items-center rounded-full bg-blush text-magenta">
+                      <Icon name={option.icon} className="size-[1.125rem]" />
+                    </span>
+                    <span className="text-[0.9375rem] font-medium text-plum">{option.label}</span>
+                    <Icon name="check" className="size-4 text-magenta" />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
+
+          <div className="grid gap-3 sm:flex">
             <WhatsAppButton
               label={dict.common.askOnWhatsApp}
               newTabHint={dict.common.opensInNewTab}
+              message={whatsappMessage}
               size="lg"
               full
               className="sm:w-auto sm:px-7"
@@ -146,6 +175,7 @@ export default async function ServicePage({ params }: { params: Params }) {
                 <ServiceCard
                   service={other}
                   locale={locale}
+                  detailsLabel={dict.common.viewDetails}
                   sizes="(min-width: 1216px) 280px, (min-width: 768px) 23vw, 47vw"
                 />
               </li>
@@ -158,6 +188,7 @@ export default async function ServicePage({ params }: { params: Params }) {
         dict={dict}
         title={format(dict.serviceDetail.ctaTitle, { name })}
         text={dict.serviceDetail.ctaText}
+        whatsappMessage={whatsappMessage}
       />
     </>
   );
