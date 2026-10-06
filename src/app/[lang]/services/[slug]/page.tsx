@@ -10,6 +10,7 @@ import { format } from '@/i18n/dictionaries';
 import { resolveLocale } from '@/i18n/params';
 import { localizePath } from '@/i18n/routes';
 import { getService, getServices } from '@/lib/content';
+import { siteConfig } from '@/config/site';
 import { pageMetadata } from '@/lib/seo';
 
 export const revalidate = 60;
@@ -28,10 +29,12 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const { slug } = await params;
   const service = await getService(slug);
   if (!service) return {};
+  const name = service.name[locale];
   return pageMetadata({
     locale,
     path: `/services/${service.slug}`,
-    title: format(dict.meta.serviceTitle, { name: service.name[locale] }),
+    // The city joins the title only once it is confirmed in siteConfig.
+    title: siteConfig.city ? format(dict.meta.serviceTitle, { name, city: siteConfig.city[locale] }) : name,
     description: service.intro[locale] || service.summary[locale],
     image: service.image,
   });
@@ -46,9 +49,11 @@ export default async function ServicePage({ params }: { params: Params }) {
   const others = services.filter((s) => s.slug !== service.slug);
   const name = service.name[locale];
   const whatsappMessage = format(dict.whatsappMessages.service, { service: name });
+  // Treatments and availability appear only once confirmed (optional in the config).
+  const items = service.items ?? [];
   const availability: Array<{ key: string; icon: IconName; label: string }> = [
-    ...(service.availability.salon ? [{ key: 'salon', icon: 'chair' as const, label: dict.serviceDetail.availableSalon }] : []),
-    ...(service.availability.home ? [{ key: 'home', icon: 'home' as const, label: dict.serviceDetail.availableHome }] : []),
+    ...(service.availability?.salon ? [{ key: 'salon', icon: 'chair' as const, label: dict.serviceDetail.availableSalon }] : []),
+    ...(service.availability?.home ? [{ key: 'home', icon: 'home' as const, label: dict.serviceDetail.availableHome }] : []),
   ];
 
   return (
@@ -107,13 +112,13 @@ export default async function ServicePage({ params }: { params: Params }) {
             </section>
           ) : null}
 
-          {service.items.length > 0 ? (
+          {items.length > 0 ? (
             <section aria-labelledby="items-title">
               <h2 id="items-title" className="text-[1.75rem] leading-tight sm:text-3xl">
                 {format(dict.serviceDetail.itemsTitle, { name })}
               </h2>
               <ul className="mt-5 divide-y divide-line overflow-hidden rounded-card bg-white shadow-soft ring-1 ring-line/70">
-                {service.items.map((item) => (
+                {items.map((item) => (
                   <li key={item.name.en} className="flex items-center gap-4 p-4 sm:px-5">
                     <span className="grid size-10 shrink-0 place-items-center rounded-full bg-blush text-magenta">
                       <Icon name={service.icon} className="size-5" />

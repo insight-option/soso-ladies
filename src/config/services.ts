@@ -11,7 +11,7 @@ export type ServiceItem = {
   summary?: Localized;
 };
 
-/** Where the service is offered. */
+/** Where the service is offered (only once confirmed by the salon). */
 export type ServiceAvailability = {
   salon: boolean;
   home: boolean;
@@ -27,19 +27,18 @@ export type ServiceDefinition = {
   summary: Localized;
   intro: Localized;
   highlights: ServiceHighlight[];
-  /** Treatments offered under this service; the list is hidden when empty. */
-  items: ServiceItem[];
-  availability: ServiceAvailability;
+  /** Confirmed treatments only. Leave out until confirmed: the list is hidden. */
+  items?: ServiceItem[];
+  /** Confirmed salon/home availability only. Leave out until confirmed: the block is hidden. */
+  availability?: ServiceAvailability;
 };
-
-/** The salon offers both salon and home visits; confirm per service with the salon. */
-const salonAndHome: ServiceAvailability = { salon: true, home: true };
 
 /**
  * The built-in services. Adding one object here adds its card, detail page,
  * sitemap entry and footer link. When the admin database has services, they
  * take over (matched by slug) and these highlights/items/availability are kept.
- * Treatment lists come from the approved design reference; nothing else is assumed.
+ * Only confirmed details are listed: the Facial treatments come from the approved
+ * reference; other treatment lists and availability are added once confirmed.
  */
 export const services: ServiceDefinition[] = [
   {
@@ -79,7 +78,6 @@ export const services: ServiceDefinition[] = [
         summary: { en: 'For clearer and healthier skin', ar: 'لبشرة أنقى وأكثر صحة' },
       },
     ],
-    availability: salonAndHome,
   },
   {
     slug: 'permanent-makeup',
@@ -99,11 +97,6 @@ export const services: ServiceDefinition[] = [
       { icon: 'gem', label: { en: 'Professional techniques', ar: 'تقنيات احترافية' } },
       { icon: 'heart', label: { en: 'Applied with care', ar: 'تطبيق بعناية' } },
     ],
-    items: [
-      { name: { en: 'Eyebrows', ar: 'الحواجب' } },
-      { name: { en: 'Touch-up sessions', ar: 'جلسات التعديل (الرتوش)' } },
-    ],
-    availability: salonAndHome,
   },
   {
     slug: 'hair',
@@ -119,12 +112,6 @@ export const services: ServiceDefinition[] = [
       ar: 'من القصّ إلى التصفيف والصبغ، يعتني فريقنا بشعرك ليبرز جمالك الطبيعي.',
     },
     highlights: [],
-    items: [
-      { name: { en: 'Haircut', ar: 'قصّ الشعر' } },
-      { name: { en: 'Hair styling', ar: 'تصفيف الشعر' } },
-      { name: { en: 'Hair coloring', ar: 'صبغ الشعر' } },
-    ],
-    availability: salonAndHome,
   },
   {
     slug: 'nails',
@@ -140,12 +127,6 @@ export const services: ServiceDefinition[] = [
       ar: 'يدان وقدمان بإطلالة أنيقة ومُعتنى بها مع المانيكير والباديكير وفنّ الأظافر.',
     },
     highlights: [],
-    items: [
-      { name: { en: 'Manicure', ar: 'مانيكير' } },
-      { name: { en: 'Pedicure', ar: 'باديكير' } },
-      { name: { en: 'Nail art', ar: 'فنّ الأظافر' } },
-    ],
-    availability: salonAndHome,
   },
   {
     slug: 'henna',
@@ -161,10 +142,5 @@ export const services: ServiceDefinition[] = [
       ar: 'نقوش حناء أنيقة، من الزخارف التقليدية إلى الأنماط العصرية، لكل مناسبة.',
     },
     highlights: [],
-    items: [
-      { name: { en: 'Traditional henna designs', ar: 'نقوش حناء تقليدية' } },
-      { name: { en: 'Modern henna designs', ar: 'نقوش حناء عصرية' } },
-    ],
-    availability: salonAndHome,
   },
 ];

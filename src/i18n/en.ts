@@ -7,35 +7,35 @@ export const en = {
   meta: {
     siteName: 'SOSO Ladies Salon',
     defaultDescription:
-      'SOSO Ladies Salon in Doha, Qatar — professional facial, permanent makeup, hair, nails and henna services at our salon or in the comfort of your home.',
+      'SOSO Ladies Salon — professional facial, permanent makeup, hair, nails and henna services at our salon or in the comfort of your home.',
     home: {
       title: 'SOSO Ladies Salon — Your Beauty, Our Passion',
       description:
-        'Professional beauty services in Doha at our salon or in the comfort of your home. Contact SOSO Ladies Salon on WhatsApp or by phone.',
+        'Professional beauty services at our salon or in the comfort of your home. Contact SOSO Ladies Salon on WhatsApp or by phone.',
     },
     services: {
       title: 'Our Services',
       description:
-        'Facial, permanent makeup, hair, nails and henna at SOSO Ladies Salon, Doha. Contact us on WhatsApp for details.',
+        'Facial, permanent makeup, hair, nails and henna at SOSO Ladies Salon. Contact us on WhatsApp for details.',
     },
     offers: {
       title: 'Special Offers',
-      description: 'Exclusive beauty offers from SOSO Ladies Salon in Doha.',
+      description: 'Exclusive beauty offers from SOSO Ladies Salon.',
     },
     about: {
       title: 'About SOSO',
       description:
-        'Beauty, care and confidence for every woman. Learn about SOSO Ladies Salon in Doha, Qatar.',
+        'Beauty, care and confidence for every woman. Learn about SOSO Ladies Salon.',
     },
     contact: {
       title: 'Contact Us',
-      description: 'Contact SOSO Ladies Salon in Doha on WhatsApp or call {phone}.',
+      description: 'Contact SOSO Ladies Salon on WhatsApp or call {phone}.',
     },
     notFound: {
       title: 'Page not found',
     },
-    /** Title of each service page, e.g. "Facial in Doha". */
-    serviceTitle: '{name} in Doha',
+    /** Service page title once siteConfig.city is set, e.g. "Facial in Doha". */
+    serviceTitle: '{name} in {city}',
   },
   nav: {
     home: 'Home',
@@ -164,7 +164,8 @@ export const en = {
   },
   footer: {
     tagline: 'Professional beauty services at our salon or in the comfort of your home.',
-    location: 'Doha, Qatar',
+    /** Shown only once siteConfig.city is set. */
+    location: '{city}, {country}',
     explore: 'Explore',
     services: 'Services',
     contact: 'Contact',

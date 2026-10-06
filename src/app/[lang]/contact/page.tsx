@@ -8,6 +8,7 @@ import { format } from '@/i18n/dictionaries';
 import { resolveLocale, type LangParams } from '@/i18n/params';
 import { localizePath } from '@/i18n/routes';
 import { getSettings } from '@/lib/content';
+import { locationLabel } from '@/lib/location';
 import { pageMetadata } from '@/lib/seo';
 
 export const revalidate = 60;
@@ -25,6 +26,7 @@ export async function generateMetadata({ params }: { params: LangParams }): Prom
 export default async function ContactPage({ params }: { params: LangParams }) {
   const { locale, dict } = await resolveLocale(params);
   const settings = await getSettings();
+  const location = locationLabel(locale, dict.footer.location);
 
   return (
     <>
@@ -49,7 +51,7 @@ export default async function ContactPage({ params }: { params: LangParams }) {
         >
           <Logo alt={dict.meta.siteName} className="h-40 sm:h-48" sizes="150px" />
           <p className="mt-6 max-w-xs text-muted">{dict.footer.tagline}</p>
-          <p className="mt-2 text-sm font-medium text-plum">{dict.footer.location}</p>
+          {location ? <p className="mt-2 text-sm font-medium text-plum">{location}</p> : null}
           <div className="mt-7 grid w-full gap-3 min-[400px]:grid-cols-2">
             <WhatsAppButton label={dict.common.whatsapp} newTabHint={dict.common.opensInNewTab} full />
             <CallButton label={dict.common.callNow} full />

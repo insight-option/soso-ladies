@@ -112,8 +112,8 @@ async function getSettingsRow(): Promise<SettingsRow | null> {
 
 /**
  * Published services in display order. Database rows win (matched by slug) and
- * keep the highlights, treatments and availability of the matching static
- * service; services that only exist in the database have no treatment list.
+ * keep the highlights and any confirmed treatments/availability of the matching
+ * static service; nothing is assumed for services that only exist in the database.
  */
 const loadServices = unstable_cache(
   async (): Promise<Service[]> => {
@@ -142,8 +142,8 @@ const loadServices = unstable_cache(
             summary,
             intro: localized(row.introEn, row.introAr) ?? base?.intro ?? summary,
             highlights: base?.highlights ?? [],
-            items: base?.items ?? [],
-            availability: base?.availability ?? { salon: true, home: true },
+            items: base?.items,
+            availability: base?.availability,
           },
         ];
       });
