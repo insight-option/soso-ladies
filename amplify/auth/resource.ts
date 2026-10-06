@@ -1,8 +1,9 @@
 import { defineAuth } from '@aws-amplify/backend';
 
 /**
- * Define and configure your auth resource
- * @see https://docs.amplify.aws/gen2/build-a-backend/auth
+ * One owner account signs in with email + password. Self sign-up is disabled in
+ * backend.ts (allowAdminCreateUserOnly), so the owner is created from the
+ * Amplify console / Cognito, never from the website.
  */
 export const auth = defineAuth({
   loginWith: {
