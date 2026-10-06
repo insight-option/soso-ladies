@@ -46,7 +46,17 @@ npx npm@10 ci
 | Offers | `src/config/offers.ts` or `/admin → العروض` | Empty → Offers page shows "coming soon", Home hides the section. |
 | Hero video / poster | `public/video/` or `/admin → الوسائط` | Bundled files are the default. |
 
-Database values win over the static files. Services are matched by slug, so built-in services keep their highlights and sub-services. Only published items are shown, sorted by their order in the admin. Pages are regenerated every 60 seconds (ISR), so admin changes appear within about a minute without a redeploy.
+Database values win over the static files. Services are matched by slug, so built-in services keep their highlights and sub-services. Only published items are shown, sorted by their order in the admin.
+
+### Caching: admin edits appear within ~60 seconds
+
+- **Pages**: the public pages (`src/app/[lang]/**`, `sitemap.ts`) use `dynamic = 'force-dynamic'`, so they are rendered on every request. We deliberately do not use ISR or prerendering. On Amplify Hosting, each server instance kept its own copy of prerendered pages, starting from the build-time copy. Visitors then saw old and new content alternate, depending on which instance answered.
+- **Data**: `src/lib/content.ts` keeps successful database responses in memory for **60 seconds per server instance**. The database is read at most once per minute per model and instance, and an edit made in `/admin` shows up on every page within about 60 seconds, with no redeploy.
+- **Failures are never cached**: if a read fails, that request shows the static content from `src/config` and the next request retries. A new server instance always reads from the database, never from build-time data.
+- **Logs** (Amplify console → *Hosting → Monitoring → Hosting compute logs*, i.e. CloudWatch). Messages contain only the error name and message, never error objects, keys, tokens or configuration:
+  - `[amplify] services read failed: <ErrorName>: <message>` (also `offers read` / `settings read`): a database read failed, and that request used the static content.
+  - `[amplify] amplify_outputs.json not found …`: the backend config is missing. Logged once per instance; retried on every request.
+  - `[content] services: database returned 0 rows; using static config`: a successful but empty read, e.g. before "Import current services".
 
 Uploaded files are stored in S3 under `media/` and served through `/api/media/<key>`. That route redirects to a fresh presigned URL, so presigned URLs never end up in cached HTML.
 
@@ -94,7 +104,7 @@ In `/admin` → **الخدمات**, press **استيراد الخدمات الح
 | `/admin` says the backend is not deployed | The backend phase did not produce `amplify_outputs.json`. Check the backend step of the build log and the service role. |
 | Build fails at `npm ci` | The lockfile was updated with npm 11. Regenerate it with npm 10 (see above). |
 | Uploaded image doesn't show | Check the `media/*` objects in the Amplify Storage bucket, and the guest read access defined in `amplify/storage/resource.ts`. |
-| Change not visible | Pages refresh at most every 60 s. Reload after a minute. |
+| Change not visible | Database responses are cached for up to 60 s per server instance. Reload after a minute. If it is still old, look for `[amplify] … read failed` in the Hosting compute logs. |
 
 ## Structure
 

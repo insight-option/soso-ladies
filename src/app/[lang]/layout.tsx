@@ -7,16 +7,13 @@ import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { siteConfig } from '@/config/site';
 import { fontVariables } from '@/fonts';
-import { localeDir, locales } from '@/i18n/config';
+import { localeDir } from '@/i18n/config';
 import { resolveLocale, type LangParams } from '@/i18n/params';
 import { getServices, getSettings } from '@/lib/content';
 import { beautySalonJsonLd } from '@/lib/seo';
 
-export const revalidate = 60;
-
-export function generateStaticParams() {
-  return locales.map((lang) => ({ lang }));
-}
+// Rendered on every request so admin edits show up within ~60 s (see lib/content.ts).
+export const dynamic = 'force-dynamic';
 
 export const viewport: Viewport = {
   width: 'device-width',

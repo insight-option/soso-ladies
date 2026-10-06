@@ -4,7 +4,8 @@ import { locales } from '@/i18n/config';
 import { localizePath } from '@/i18n/routes';
 import { getServices } from '@/lib/content';
 
-export const revalidate = 60;
+// Rendered on every request so admin edits show up within ~60 s (see lib/content.ts).
+export const dynamic = 'force-dynamic';
 
 const absolute = (path: string) => new URL(path, siteConfig.url).toString();
 

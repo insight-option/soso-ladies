@@ -30,6 +30,18 @@ export async function readAmplifyOutputs(): Promise<Record<string, unknown> | nu
   }
 }
 
+/**
+ * Logs a failure for CloudWatch without leaking anything sensitive: only the
+ * error name and a shortened single-line message — never the error object,
+ * request metadata, credentials, tokens or configuration.
+ */
+export function logServerError(label: string, error: unknown): void {
+  const name = error instanceof Error ? error.name : typeof error;
+  const message = error instanceof Error ? error.message : '';
+  const safeMessage = message.replace(/\s+/g, ' ').slice(0, 300);
+  console.error(`[amplify] ${label} failed: ${name}${safeMessage ? `: ${safeMessage}` : ''}`);
+}
+
 export type AmplifyBackend = {
   runWithAmplifyServerContext: ReturnType<typeof createServerRunner>['runWithAmplifyServerContext'];
   client: ClientUsingSSRReq<Schema>;
@@ -42,13 +54,34 @@ function createBackend(json: Record<string, unknown>): AmplifyBackend {
   return { runWithAmplifyServerContext, client };
 }
 
-let backend: Promise<AmplifyBackend | null> | undefined;
+// Only a successfully created backend is kept for the life of the instance. A
+// missing config or a failed setup is retried on the next request.
+let backend: AmplifyBackend | undefined;
+let pending: Promise<AmplifyBackend | null> | undefined;
+let reportedMissingConfig = false;
 
 function getBackend(): Promise<AmplifyBackend | null> {
-  backend ??= readAmplifyOutputs()
-    .then((outputs) => (outputs ? createBackend(outputs) : null))
-    .catch(() => null);
-  return backend;
+  if (backend) return Promise.resolve(backend);
+  pending ??= (async () => {
+    try {
+      const outputs = await readAmplifyOutputs();
+      if (!outputs) {
+        if (!reportedMissingConfig) {
+          reportedMissingConfig = true;
+          console.error('[amplify] amplify_outputs.json not found (file or build-time copy); using static content');
+        }
+        return null;
+      }
+      backend = createBackend(outputs);
+      return backend;
+    } catch (error) {
+      logServerError('backend setup', error);
+      return null;
+    } finally {
+      pending = undefined;
+    }
+  })();
+  return pending;
 }
 
 const TIMEOUT_MS = 8000;
@@ -71,11 +104,12 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
 
 /**
  * Runs an operation as an anonymous visitor (identity pool guest role, no
- * cookies), so pages stay statically renderable. Returns null when the backend
- * is not configured or the call fails, letting callers fall back to static data.
+ * cookies). Returns null when the backend is not configured or the call fails
+ * (logged safely), letting callers fall back to static data.
  */
 export async function runAsGuest<T>(
   operation: (backend: AmplifyBackend, context: AmplifyContext) => Promise<T>,
+  label = 'guest request',
 ): Promise<T | null> {
   const resolved = await getBackend();
   if (!resolved) return null;
@@ -88,7 +122,7 @@ export async function runAsGuest<T>(
       TIMEOUT_MS,
     );
   } catch (error) {
-    console.error('[amplify] request failed, using static content instead:', error);
+    logServerError(label, error);
     return null;
   }
 }
