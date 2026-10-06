@@ -61,6 +61,7 @@ export const en = {
     whatsappLabel: 'Chat with SOSO Ladies Salon on WhatsApp',
     callLabel: 'Call SOSO Ladies Salon',
     viewDetails: 'View Details',
+    availableAtHome: 'Available at home',
     viewAllServices: 'View All Services',
     viewAllOffers: 'View All Offers',
     breadcrumbLabel: 'Breadcrumb',
@@ -106,6 +107,7 @@ export const en = {
     homeTitle: 'Home Service',
     homeText: 'Enjoy professional beauty services in the comfort of your home.',
     homeImageAlt: 'A SOSO beautician with a client at home',
+    homeServicesLabel: 'Services available at home',
   },
   offersSection: {
     title: 'Special Offers',
@@ -124,7 +126,7 @@ export const en = {
   },
   serviceDetail: {
     highlightsTitle: 'What to expect',
-    availabilityTitle: 'Where we offer it',
+    availabilityTitle: 'Where the service is available',
     availableSalon: 'At the salon',
     availableHome: 'At your home',
     itemsTitle: 'Our {name} Services',

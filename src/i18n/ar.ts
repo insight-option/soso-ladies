@@ -56,6 +56,7 @@ export const ar: Dictionary = {
     whatsappLabel: 'تواصلي مع سوسو صالون نسائي عبر واتساب',
     callLabel: 'اتصلي بسوسو صالون نسائي',
     viewDetails: 'عرض التفاصيل',
+    availableAtHome: 'متاحة في المنزل',
     viewAllServices: 'عرض كل الخدمات',
     viewAllOffers: 'عرض كل العروض',
     breadcrumbLabel: 'مسار التنقل',
@@ -99,6 +100,7 @@ export const ar: Dictionary = {
     homeTitle: 'خدمة منزلية',
     homeText: 'استمتعي بخدمات تجميل احترافية في راحة منزلك.',
     homeImageAlt: 'خبيرة تجميل من سوسو مع عميلة في منزلها',
+    homeServicesLabel: 'خدمات متاحة في المنزل',
   },
   offersSection: {
     title: 'العروض الخاصة',

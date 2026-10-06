@@ -58,6 +58,11 @@ function isPublished(row: { published?: boolean | null }) {
   return row.published !== false;
 }
 
+/** true/false when set in the database; undefined when null (not set yet). */
+function optionalBoolean(value: boolean | null | undefined): boolean | undefined {
+  return typeof value === 'boolean' ? value : undefined;
+}
+
 function price(value: number | null | undefined): number | null {
   return typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : null;
 }
@@ -112,8 +117,10 @@ async function getSettingsRow(): Promise<SettingsRow | null> {
 
 /**
  * Published services in display order. Database rows win (matched by slug) and
- * keep the highlights and any confirmed treatments/availability of the matching
- * static service; nothing is assumed for services that only exist in the database.
+ * keep the highlights and any confirmed treatments of the matching static
+ * service. Salon/home availability comes from the database when set (true or
+ * false); otherwise from the static config, which leaves it undefined unless
+ * explicitly confirmed. Nothing is assumed.
  */
 const loadServices = unstable_cache(
   async (): Promise<Service[]> => {
@@ -143,7 +150,8 @@ const loadServices = unstable_cache(
             intro: localized(row.introEn, row.introAr) ?? base?.intro ?? summary,
             highlights: base?.highlights ?? [],
             items: base?.items,
-            availability: base?.availability,
+            availableAtSalon: optionalBoolean(row.availableAtSalon) ?? base?.availableAtSalon,
+            availableAtHome: optionalBoolean(row.availableAtHome) ?? base?.availableAtHome,
           },
         ];
       });

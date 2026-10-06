@@ -11,12 +11,6 @@ export type ServiceItem = {
   summary?: Localized;
 };
 
-/** Where the service is offered (only once confirmed by the salon). */
-export type ServiceAvailability = {
-  salon: boolean;
-  home: boolean;
-};
-
 export type ServiceDefinition = {
   /** URL segment: /services/<slug>. Lowercase letters, digits and dashes. */
   slug: string;
@@ -29,16 +23,21 @@ export type ServiceDefinition = {
   highlights: ServiceHighlight[];
   /** Confirmed treatments only. Leave out until confirmed: the list is hidden. */
   items?: ServiceItem[];
-  /** Confirmed salon/home availability only. Leave out until confirmed: the block is hidden. */
-  availability?: ServiceAvailability;
+  /**
+   * Where the service is offered. Normally set per service in /admin (database
+   * values win); leave out here unless confirmed. Only `true` is shown on the site.
+   */
+  availableAtSalon?: boolean;
+  availableAtHome?: boolean;
 };
 
 /**
  * The built-in services. Adding one object here adds its card, detail page,
  * sitemap entry and footer link. When the admin database has services, they
- * take over (matched by slug) and these highlights/items/availability are kept.
+ * take over (matched by slug) and these highlights/items are kept.
  * Only confirmed details are listed: the Facial treatments come from the approved
- * reference; other treatment lists and availability are added once confirmed.
+ * reference; other treatment lists are added once confirmed. Salon/home
+ * availability is managed per service in /admin and is not assumed here.
  */
 export const services: ServiceDefinition[] = [
   {

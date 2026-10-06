@@ -13,6 +13,18 @@ const cardClass =
 const stretchedLink = 'after:absolute after:inset-0 after:content-[""] focus-visible:outline-none';
 const zoom = 'transition-transform duration-700 ease-soft motion-safe:group-hover:scale-[1.04]';
 
+/** Shown only when the service is confirmed as available at home. */
+function HomeBadge({ label, className }: { label: string; className?: string }) {
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full bg-white/95 px-2.5 py-1 text-[0.6875rem] font-semibold text-plum shadow-soft ring-1 ring-line/70 sm:text-xs ${className ?? ''}`}
+    >
+      <Icon name="home" className="size-3.5 text-magenta" />
+      {label}
+    </span>
+  );
+}
+
 function DetailsLabel({ label }: { label: string }) {
   return (
     <span
@@ -34,24 +46,32 @@ export function ServiceCard({
   locale,
   sizes,
   detailsLabel,
+  homeLabel,
   headingLevel: Heading = 'h3',
 }: {
   service: Service;
   locale: Locale;
   sizes: string;
   detailsLabel: string;
+  /** "Available at home" badge text; the badge shows only when availableAtHome is true. */
+  homeLabel: string;
   headingLevel?: 'h2' | 'h3';
 }) {
   return (
     <article className={`${cardClass} flex flex-col`}>
-      <MediaImage
-        src={service.image}
-        alt=""
-        icon={service.icon}
-        sizes={sizes}
-        className="aspect-[4/5]"
-        imageClassName={zoom}
-      />
+      <div className="relative">
+        <MediaImage
+          src={service.image}
+          alt=""
+          icon={service.icon}
+          sizes={sizes}
+          className="aspect-[4/5]"
+          imageClassName={zoom}
+        />
+        {service.availableAtHome === true ? (
+          <HomeBadge label={homeLabel} className="absolute start-2 top-2 sm:start-3 sm:top-3" />
+        ) : null}
+      </div>
       <div className="flex flex-1 flex-col p-3.5 sm:p-5">
         {/* A fixed two-line summary keeps cards even; rows stretch to equal height. */}
         <Heading className="line-clamp-2 text-[1.0625rem] leading-snug sm:text-xl">
@@ -75,10 +95,12 @@ export function ServiceRow({
   service,
   locale,
   detailsLabel,
+  homeLabel,
 }: {
   service: Service;
   locale: Locale;
   detailsLabel: string;
+  homeLabel: string;
 }) {
   return (
     <article className={`${cardClass} flex gap-4 p-3 sm:gap-5 sm:p-4`}>
@@ -99,6 +121,7 @@ export function ServiceRow({
         {service.summary[locale] ? (
           <p className="mt-1.5 line-clamp-3 text-sm text-muted sm:text-[0.9375rem]">{service.summary[locale]}</p>
         ) : null}
+        {service.availableAtHome === true ? <HomeBadge label={homeLabel} className="mt-2.5 self-start" /> : null}
         <span className="mt-auto pt-3">
           <DetailsLabel label={detailsLabel} />
         </span>

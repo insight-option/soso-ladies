@@ -51,6 +51,7 @@ export default async function HomePage({ params }: { params: LangParams }) {
                 service={service}
                 locale={locale}
                 detailsLabel={dict.common.viewDetails}
+                homeLabel={dict.common.availableAtHome}
                 sizes="(min-width: 1216px) 220px, (min-width: 1024px) 19vw, (min-width: 768px) 31vw, 47vw"
               />
             </li>
@@ -58,7 +59,7 @@ export default async function HomePage({ params }: { params: LangParams }) {
         </ul>
       </section>
 
-      <ServiceModes dict={dict} />
+      <ServiceModes dict={dict} locale={locale} services={services} />
 
       {offers.length > 0 ? (
         <section aria-labelledby="offers-title" className="container-page pt-16 sm:pt-20">

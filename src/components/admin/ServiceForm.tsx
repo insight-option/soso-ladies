@@ -35,6 +35,9 @@ type Draft = {
   icon: IconName;
   image: ImageValue;
   published: boolean;
+  /** Unchecked is saved as false ("off"); null in the database means "not set yet". */
+  availableAtSalon: boolean;
+  availableAtHome: boolean;
 };
 
 type Errors = Partial<Record<keyof Draft, string>>;
@@ -51,6 +54,8 @@ function toDraft(row: ServiceRow | null): Draft {
     icon: isIconName(row?.icon) ? row.icon : 'sparkles',
     image: { path: row?.imagePath ?? null, pending: null },
     published: row?.published !== false,
+    availableAtSalon: row?.availableAtSalon === true,
+    availableAtHome: row?.availableAtHome === true,
   };
 }
 
@@ -73,6 +78,9 @@ export function ServiceForm({ initial, onDone }: { initial: ServiceRow | null; o
   const formRef = useRef<HTMLDivElement>(null);
 
   const dirty = !sameDraft(draft, initialDraft);
+  // Never saved with availability yet (new, imported or older records).
+  const availabilityNotSet =
+    (initial?.availableAtSalon ?? null) === null && (initial?.availableAtHome ?? null) === null;
   useUnsavedChanges(dirty && !saving);
 
   function validate(value: Draft): Errors {
@@ -121,6 +129,8 @@ export function ServiceForm({ initial, onDone }: { initial: ServiceRow | null; o
         icon: draft.icon,
         imagePath,
         published: draft.published,
+        availableAtSalon: draft.availableAtSalon,
+        availableAtHome: draft.availableAtHome,
       };
       const saved = initial
         ? must(await client.models.Service.update({ id: initial.id, ...fields }))
@@ -209,6 +219,27 @@ export function ServiceForm({ initial, onDone }: { initial: ServiceRow | null; o
               <Toggle checked={draft.published} onChange={(v) => set('published', v)} label={t.publishToggle} />
             </div>
           </div>
+        </Panel>
+
+        <Panel title={t.services.whereTitle} description={t.services.whereHint}>
+          <div className="flex flex-col gap-4 sm:flex-row sm:gap-10">
+            <Toggle
+              checked={draft.availableAtSalon}
+              onChange={(v) => set('availableAtSalon', v)}
+              label={t.services.atSalon}
+            />
+            <Toggle
+              checked={draft.availableAtHome}
+              onChange={(v) => set('availableAtHome', v)}
+              label={t.services.atHome}
+            />
+          </div>
+          {availabilityNotSet ? (
+            <p className="mt-4 flex items-start gap-2 rounded-xl bg-cream px-3 py-2 text-xs text-muted">
+              <Icon name="info" className="mt-px size-4 shrink-0 text-magenta" />
+              {t.services.notSetYet}
+            </p>
+          ) : null}
         </Panel>
 
         <Panel>

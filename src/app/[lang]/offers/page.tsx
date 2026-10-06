@@ -97,6 +97,7 @@ export default async function OffersPage({ params }: { params: LangParams }) {
                     service={service}
                     locale={locale}
                     detailsLabel={dict.common.viewDetails}
+                    homeLabel={dict.common.availableAtHome}
                     sizes="(min-width: 1216px) 220px, (min-width: 1024px) 19vw, (min-width: 768px) 31vw, 47vw"
                   />
                 </li>

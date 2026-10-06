@@ -35,7 +35,12 @@ export default async function ServicesPage({ params }: { params: LangParams }) {
         <ul className="grid gap-4 sm:gap-5 md:grid-cols-2">
           {services.map((service) => (
             <li key={service.slug}>
-              <ServiceRow service={service} locale={locale} detailsLabel={dict.common.viewDetails} />
+              <ServiceRow
+                service={service}
+                locale={locale}
+                detailsLabel={dict.common.viewDetails}
+                homeLabel={dict.common.availableAtHome}
+              />
             </li>
           ))}
         </ul>

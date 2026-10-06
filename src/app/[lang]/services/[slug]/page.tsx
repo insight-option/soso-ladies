@@ -49,11 +49,16 @@ export default async function ServicePage({ params }: { params: Params }) {
   const others = services.filter((s) => s.slug !== service.slug);
   const name = service.name[locale];
   const whatsappMessage = format(dict.whatsappMessages.service, { service: name });
-  // Treatments and availability appear only once confirmed (optional in the config).
+  // Only confirmed details: treatments when listed, and only the availability
+  // options set to true (from /admin); with neither, the block is hidden.
   const items = service.items ?? [];
   const availability: Array<{ key: string; icon: IconName; label: string }> = [
-    ...(service.availability?.salon ? [{ key: 'salon', icon: 'chair' as const, label: dict.serviceDetail.availableSalon }] : []),
-    ...(service.availability?.home ? [{ key: 'home', icon: 'home' as const, label: dict.serviceDetail.availableHome }] : []),
+    ...(service.availableAtSalon === true
+      ? [{ key: 'salon', icon: 'chair' as const, label: dict.serviceDetail.availableSalon }]
+      : []),
+    ...(service.availableAtHome === true
+      ? [{ key: 'home', icon: 'home' as const, label: dict.serviceDetail.availableHome }]
+      : []),
   ];
 
   return (
@@ -181,6 +186,7 @@ export default async function ServicePage({ params }: { params: Params }) {
                   service={other}
                   locale={locale}
                   detailsLabel={dict.common.viewDetails}
+                  homeLabel={dict.common.availableAtHome}
                   sizes="(min-width: 1216px) 280px, (min-width: 768px) 23vw, 47vw"
                 />
               </li>

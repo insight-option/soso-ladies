@@ -19,6 +19,10 @@ const schema = a.schema({
       icon: a.string(),
       sortOrder: a.integer(),
       published: a.boolean(),
+      // Where the service is offered. Optional with no default: null = not set
+      // yet (nothing is shown on the site); set from the admin service form.
+      availableAtSalon: a.boolean(),
+      availableAtHome: a.boolean(),
     })
     .authorization((allow) => [allow.guest().to(['read']), allow.authenticated()]),
 
